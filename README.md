@@ -1,4 +1,4 @@
-# BasicDrive2017
+# BasicDrive2017 [![Build Status](https://travis-ci.org/frc2879/BasicDrive2017.svg?branch=master)](https://travis-ci.org/frc2879/BasicDrive2017)
 Basic drive code for our 2017 drivetrain
 
 To set up this module in your development environment, follow these steps:
