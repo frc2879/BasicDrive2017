@@ -19,13 +19,27 @@ public class RobotModule extends IterativeModule {
     public static boolean DRIVE_SQUAREDINPUTS;
     public static boolean DRIVE_BRAKE;
 
-    public static int TALONS_LF, TALONS_LB, TALONS_RF, TALONS_RB;
+    public static int TALONS_LF_ID, TALONS_LB_ID, TALONS_RF_ID, TALONS_RB_ID;
+
+    public static boolean TALONS_LF_INV, TALONS_LB_INV, TALONS_RF_INV, TALONS_RB_INV;
 
     public CANTalon[] talons;
 
     public RobotDrive robotDrive;
 
     public final XboxController driveJoystick = new XboxController(0);
+
+    private double getdoublefromstickname(String name) {
+        switch (name.toLowerCase()) {
+            case "leftx" : return driveJoystick.leftStick.getX();
+            case "lefty" : return driveJoystick.leftStick.getY();
+            case "rightx" : return driveJoystick.rightStick.getX();
+            case "righty" : return driveJoystick.rightStick.getY();
+            default : return 0;
+        }
+    }
+
+    public static String MECANUMDRIVE_X, MECANUMDRIVE_Y, MECANUMDRIVE_ROT;
 
     @Override
     public String getModuleName() {
@@ -34,7 +48,7 @@ public class RobotModule extends IterativeModule {
 
     @Override
     public String getModuleVersion() {
-        return "0.0.1";
+        return "0.1.0";
     }
 
     @Override
@@ -44,17 +58,29 @@ public class RobotModule extends IterativeModule {
 
         pref = new ModuleConfig("BasicDrive2017");
 
+        driveJoystick.leftStick.setDeadZone(pref.getDouble("xboxcontroller.deadzones.leftstick", 0.1));
+        driveJoystick.rightStick.setDeadZone(pref.getDouble("xboxcontroller.deadzones.rightstick", 0.1));
+
         DRIVE_SQUAREDINPUTS = pref.getBoolean("drive.squaredinputs", false);
         DRIVE_BRAKE = pref.getBoolean("drive.brake", false);
 
-        TALONS_LF = pref.getInt("talons.left.front", 1);
-        TALONS_LB = pref.getInt("talons.left.back", 2);
-        TALONS_RF = pref.getInt("talons.right.front", 3);
-        TALONS_RB = pref.getInt("talons.right.back", 4);
+        TALONS_LF_ID = pref.getInt("talons.left.front.id", 1);
+        TALONS_LB_ID = pref.getInt("talons.left.back.id", 2);
+        TALONS_RF_ID = pref.getInt("talons.right.front.id", 3);
+        TALONS_RB_ID = pref.getInt("talons.right.back.id", 4);
+
+        TALONS_LF_INV = pref.getBoolean("talons.left.front.inverted", false);
+        TALONS_LB_INV = pref.getBoolean("talons.left.back.inverted", false);
+        TALONS_RF_INV = pref.getBoolean("talons.right.front.inverted", false);
+        TALONS_RB_INV = pref.getBoolean("talons.right.back.inverted", false);
+
+        MECANUMDRIVE_X = pref.getString("mecanumdrive.control.x", "leftx");
+        MECANUMDRIVE_Y = pref.getString("mecanumdrive.control.y", "lefty");
+        MECANUMDRIVE_ROT = pref.getString("mecanumdrive.control.rotation", "rightx");
 
         talons = new CANTalon[] {
-                Registrar.canTalon(TALONS_LF), Registrar.canTalon(TALONS_LB),
-                Registrar.canTalon(TALONS_RF), Registrar.canTalon(TALONS_RB)};
+                Registrar.canTalon(TALONS_LF_ID), Registrar.canTalon(TALONS_LB_ID),
+                Registrar.canTalon(TALONS_RF_ID), Registrar.canTalon(TALONS_RB_ID)};
 
         for (CANTalon t: talons) {
             t.changeControlMode(CANTalon.TalonControlMode.PercentVbus);
@@ -68,6 +94,6 @@ public class RobotModule extends IterativeModule {
     }
 
     public void teleopPeriodic() {
-        robotDrive.mecanumDrive_Cartesian(driveJoystick.leftStick.getX(), driveJoystick.leftStick.getY(), driveJoystick.rightStick.getX(),0);
+        robotDrive.mecanumDrive_Cartesian(getdoublefromstickname(MECANUMDRIVE_X), getdoublefromstickname(MECANUMDRIVE_Y),getdoublefromstickname(MECANUMDRIVE_ROT),0);
     }
 }
